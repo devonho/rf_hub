@@ -149,11 +149,12 @@ public class BluetoothChat extends Activity {
         mConversationView.setAdapter(mConversationArrayAdapter);
 
         // Initialize the compose field with a listener for the return key
-        mOutEditText = (EditText) findViewById(R.id.edit_text_out);
-        mOutEditText.setOnEditorActionListener(mWriteListener);
+        //mOutEditText = (EditText) findViewById(R.id.edit_text_out);
+        //mOutEditText.setOnEditorActionListener(mWriteListener);
 
         // Initialize the send button with a listener that for click events
-        mSendButton = (Button) findViewById(R.id.button_send);
+        //mSendButton = (Button) findViewById(R.id.button_send);
+        /*       
         mSendButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 // Send a message using content of the edit text widget
@@ -162,7 +163,7 @@ public class BluetoothChat extends Activity {
                 sendMessage(message);
             }
         });
-
+		*/
         // Initialize the BluetoothChatService to perform bluetooth connections
         mChatService = new BluetoothChatService(this, mHandler);
 
@@ -335,20 +336,23 @@ public class BluetoothChat extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent serverIntent = null;
         switch (item.getItemId()) {
+        /*
         case R.id.secure_connect_scan:
             // Launch the DeviceListActivity to see devices and do scan
             serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
             return true;
+            */
         case R.id.insecure_connect_scan:
             // Launch the DeviceListActivity to see devices and do scan
             serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
             return true;
+            /*
         case R.id.discoverable:
             // Ensure this device is discoverable by others
             ensureDiscoverable();
-            return true;
+            return true;*/
         }
         return false;
     }

@@ -18,7 +18,9 @@ package com.example.android.BluetoothChat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -450,14 +452,15 @@ public class BluetoothChatService {
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
-            int bytes;
+            int bytes = 0;
 
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
-                    // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
-
+                    // Read from the InputStream                	                	
+                	LineReader lr = new LineReader(new InputStreamReader(mmInStream));
+                	buffer = lr.readLine();
+                	bytes = buffer.length;
                     // Send the obtained bytes to the UI Activity
                     mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
@@ -493,4 +496,25 @@ public class BluetoothChatService {
             }
         }
     }
+    
+    public class LineReader {   
+    	  private InputStreamReader ir;
+    	  
+    	  public LineReader(InputStreamReader ir) { this.ir = ir; }
+    	  
+    	  public byte[] readLine() throws IOException {
+    	    StringBuilder sb = new StringBuilder();
+    	    int i;
+    	    while (0 <= (i = ir.read())) {
+    	      if (i == '\n') {
+    	          break;    	        
+    	      } else {
+    	        sb.append((char)i);  
+    	      }
+    	    }
+    	    byte[] bytes = new byte[100];
+    	    ByteBuffer.wrap(bytes).asCharBuffer().put(sb.toString());
+    	    return bytes;    	    
+    	  }
+    	}
 }
