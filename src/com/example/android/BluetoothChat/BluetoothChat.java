@@ -16,6 +16,8 @@
 
 package com.example.android.BluetoothChat;
 
+import java.util.Hashtable;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -28,14 +30,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,10 +63,12 @@ public class BluetoothChat extends Activity {
 
     // Layout Views
     private TextView mTitle;
-    private ListView mConversationView;
-    private EditText mOutEditText;
-    private Button mSendButton;
-
+    //private ListView mConversationView;
+    //private EditText mOutEditText;
+    //private Button mSendButton;
+    private ImageView[] mImageViewLEDs;
+    private TextView[] mTextViewLEDs;
+    
     // Name of the connected device
     private String mConnectedDeviceName = null;
     // Array adapter for the conversation thread
@@ -96,6 +96,18 @@ public class BluetoothChat extends Activity {
         mTitle.setText(R.string.app_name);
         mTitle = (TextView) findViewById(R.id.title_right_text);
 
+        // Set up UI
+        mImageViewLEDs = new ImageView[4];
+        mImageViewLEDs[0] = (ImageView)findViewById(R.id.imageView1);
+        mImageViewLEDs[1] = (ImageView)findViewById(R.id.imageView2);
+        mImageViewLEDs[2] = (ImageView)findViewById(R.id.imageView3);
+        mImageViewLEDs[3] = (ImageView)findViewById(R.id.imageView4);
+        mTextViewLEDs = new TextView[4];
+        mTextViewLEDs[0] = (TextView)findViewById(R.id.textView1);
+        mTextViewLEDs[1] = (TextView)findViewById(R.id.textView2);
+        mTextViewLEDs[2] = (TextView)findViewById(R.id.textView3);
+        mTextViewLEDs[3] = (TextView)findViewById(R.id.textView4);
+               
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -144,9 +156,9 @@ public class BluetoothChat extends Activity {
         Log.d(TAG, "setupChat()");
 
         // Initialize the array adapter for the conversation thread
-        mConversationArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
-        mConversationView = (ListView) findViewById(R.id.in);
-        mConversationView.setAdapter(mConversationArrayAdapter);
+        //mConversationArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
+        //mConversationView = (ListView) findViewById(R.id.in);
+        //mConversationView.setAdapter(mConversationArrayAdapter);
 
         // Initialize the compose field with a listener for the return key
         //mOutEditText = (EditText) findViewById(R.id.edit_text_out);
@@ -164,6 +176,7 @@ public class BluetoothChat extends Activity {
             }
         });
 		*/
+        
         // Initialize the BluetoothChatService to perform bluetooth connections
         mChatService = new BluetoothChatService(this, mHandler);
 
@@ -220,7 +233,7 @@ public class BluetoothChat extends Activity {
 
             // Reset out string buffer to zero and clear the edit text field
             mOutStringBuffer.setLength(0);
-            mOutEditText.setText(mOutStringBuffer);
+            //mOutEditText.setText(mOutStringBuffer);
         }
     }
 
@@ -237,6 +250,54 @@ public class BluetoothChat extends Activity {
             return true;
         }
     };
+    private Hashtable<Integer,Thread> htLEDthreads = new Hashtable<Integer,Thread>(); 
+    private void flashLED(final int id) {
+    	
+    	if(htLEDthreads.containsKey(id))
+    	{
+    		if(htLEDthreads.get(id).isAlive())
+    			return;
+    		else
+    			htLEDthreads.remove(id);
+    	}
+
+		Thread th = 
+		new Thread()
+    	{
+    		@Override
+    		public void run()
+    		{
+    			for(int i=0;i<10;i++)
+    			{
+	    			try {    			
+		    	    	runOnUiThread(new Runnable() {
+		    	    		@Override
+		    	    		public void run()
+		    	    		{
+		    		    			mImageViewLEDs[id].setImageResource(R.drawable.led_on);
+		    	    		}    		
+		    	    	});
+		    	    	Thread.sleep(100);
+		    	    	runOnUiThread(new Runnable() {
+		    	    		@Override
+		    	    		public void run()
+		    	    		{
+		    		    			mImageViewLEDs[id].setImageResource(R.drawable.led_off);
+		    	    		}    		
+		    	    	});
+		    	    	Thread.sleep(100);
+	    			}
+	    			catch(InterruptedException e)
+	    			{
+	    				
+		    			}
+    			}
+    		}    		
+    	};
+    	htLEDthreads.put(id, th);
+		th.start();    		
+    }
+    
 
     // The Handler that gets information back from the BluetoothChatService
     private final Handler mHandler = new Handler() {
@@ -249,7 +310,7 @@ public class BluetoothChat extends Activity {
                 case BluetoothChatService.STATE_CONNECTED:
                     mTitle.setText(R.string.title_connected_to);
                     mTitle.append(mConnectedDeviceName);
-                    mConversationArrayAdapter.clear();
+                    //mConversationArrayAdapter.clear();
                     break;
                 case BluetoothChatService.STATE_CONNECTING:
                     mTitle.setText(R.string.title_connecting);
@@ -264,13 +325,14 @@ public class BluetoothChat extends Activity {
                 byte[] writeBuf = (byte[]) msg.obj;
                 // construct a string from the buffer
                 String writeMessage = new String(writeBuf);
-                mConversationArrayAdapter.add("Me:  " + writeMessage);
+                //mConversationArrayAdapter.add("Me:  " + writeMessage);
                 break;
             case MESSAGE_READ:
-                byte[] readBuf = (byte[]) msg.obj;
+                //byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
-                String readMessage = new String(readBuf, 0, msg.arg1);
-                mConversationArrayAdapter.add(/*mConnectedDeviceName+":  " + */readMessage);
+                //String readMessage = new String(readBuf, 0, msg.arg1);
+                //mConversationArrayAdapter.add(/*mConnectedDeviceName+":  " + */readMessage);
+            	flashLED((Integer)msg.obj);
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name

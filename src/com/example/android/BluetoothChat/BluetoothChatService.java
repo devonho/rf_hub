@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Hashtable;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -431,6 +432,8 @@ public class BluetoothChatService {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
+        private final Hashtable<String,Integer> mSensorIds;
+        
         public ConnectedThread(BluetoothSocket socket, String socketType) {
             Log.d(TAG, "create ConnectedThread: " + socketType);
             mmSocket = socket;
@@ -447,6 +450,18 @@ public class BluetoothChatService {
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
+            
+            mSensorIds = new Hashtable<String,Integer>();
+        }
+        
+        private int getSensorId(String id)
+        {
+        	int size = mSensorIds.size();
+        	if(!mSensorIds.containsKey(id))
+        	{
+        		mSensorIds.put(id, size);
+        	}
+    		return (Integer)mSensorIds.get(id);
         }
 
         public void run() {
@@ -461,9 +476,13 @@ public class BluetoothChatService {
                 	LineReader lr = new LineReader(new InputStreamReader(mmInStream));
                 	buffer = lr.readLine();
                 	bytes = buffer.length;
+                	
+                	String idstr = new String(buffer);
+                	int id = getSensorId(idstr);
+                	mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes, -1, id).sendToTarget();
+                	
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();
+                    //mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
