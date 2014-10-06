@@ -392,7 +392,6 @@ public class BluetoothChat extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-    	flashLED(1);
         Intent serverIntent = null;
         switch (item.getItemId()) {
         /*
@@ -404,10 +403,8 @@ public class BluetoothChat extends Activity {
             */
         case R.id.insecure_connect_scan:
             // Launch the DeviceListActivity to see devices and do scan
-        	/*
             serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-            */
             return true;
             /*
         case R.id.discoverable:
