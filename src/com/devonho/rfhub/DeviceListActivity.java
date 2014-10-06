@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.BluetoothChat;
+package com.devonho.rfhub;
 
 import java.util.Set;
 

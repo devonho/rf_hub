@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.BluetoothChat;
+package com.devonho.rfhub;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,6 +117,8 @@ public class BluetoothChatService {
         setState(STATE_LISTEN);
 
         // Start the thread to listen on a BluetoothServerSocket
+        // Disabled. Not accepting connections.
+        /*
         if (mSecureAcceptThread == null) {
             mSecureAcceptThread = new AcceptThread(true);
             mSecureAcceptThread.start();
@@ -125,6 +127,7 @@ public class BluetoothChatService {
             mInsecureAcceptThread = new AcceptThread(false);
             mInsecureAcceptThread.start();
         }
+        */
     }
 
     /**

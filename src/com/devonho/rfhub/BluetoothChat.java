@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.BluetoothChat;
+package com.devonho.rfhub;
 
 import java.util.Hashtable;
 
@@ -267,30 +267,26 @@ public class BluetoothChat extends Activity {
     		@Override
     		public void run()
     		{
-    			for(int i=0;i<10;i++)
+    			for(int i=0;i<20;i++)
     			{
+    				final boolean isOn = (i%2 == 0)?true:false;
 	    			try {    			
 		    	    	runOnUiThread(new Runnable() {
 		    	    		@Override
 		    	    		public void run()
 		    	    		{
+		    	    			if(isOn)
 		    		    			mImageViewLEDs[id].setImageResource(R.drawable.led_on);
-		    	    		}    		
-		    	    	});
-		    	    	Thread.sleep(100);
-		    	    	runOnUiThread(new Runnable() {
-		    	    		@Override
-		    	    		public void run()
-		    	    		{
+		    	    			else
 		    		    			mImageViewLEDs[id].setImageResource(R.drawable.led_off);
+		    	    				
 		    	    		}    		
 		    	    	});
 		    	    	Thread.sleep(100);
 	    			}
-	    			catch(InterruptedException e)
-	    			{
+	    			catch(InterruptedException e) {
 	    				
-		    			}
+	    			}
     			}
     		}    		
     	};
@@ -396,6 +392,7 @@ public class BluetoothChat extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+    	flashLED(1);
         Intent serverIntent = null;
         switch (item.getItemId()) {
         /*
@@ -407,8 +404,10 @@ public class BluetoothChat extends Activity {
             */
         case R.id.insecure_connect_scan:
             // Launch the DeviceListActivity to see devices and do scan
+        	/*
             serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+            */
             return true;
             /*
         case R.id.discoverable:
